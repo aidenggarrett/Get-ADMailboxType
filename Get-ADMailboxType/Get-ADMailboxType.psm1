@@ -4,14 +4,8 @@
     .Description
     The Get-ADMailboxType will query the specified domain controller and retrieve the mailbox type. It will then interpret the value in to a name.
     .Notes
-    NAME: Get-ADUserSummary
-    AUTHOR: Aiden Garrett
-    Revision: v0.1
-    Date: 2018/02/23
-    To Do:
-    Erorr Handling
-    Only query the global catalogue
-    
+    NAME: Get-ADMailboxType
+
     #Requires -Version 1
     #Requires -Modules ActiveDirectory
 #>
@@ -19,12 +13,12 @@ Function Get-ADMailboxType
     {
     [CmdletBinding(SupportsShouldProcess=$True)]
     Param(
-        
+
         # $Identity
-        [Parameter(Mandatory=$true, 
+        [Parameter(Mandatory=$true,
                    ValueFromPipeline=$true,
-                   ValueFromPipelineByPropertyName=$true, 
-                   ValueFromRemainingArguments=$false, 
+                   ValueFromPipelineByPropertyName=$true,
+                   ValueFromRemainingArguments=$false,
                    Position=0)]
         [string]$Identity,
 
@@ -50,7 +44,7 @@ Function Get-ADMailboxType
         # Retrieve Mailbox Type
 
         $tmpDBType = (Get-ADUser $Identity -Properties msExchRecipientTypeDetails -Server $Server).msExchRecipientTypeDetails
-        if ($tmpDBType -eq '2147483648' ) { $MailboxType = 'Exchange Online' } else { 
+        if ($tmpDBType -eq '2147483648' ) { $MailboxType = 'Exchange Online' } else {
            if ($tmpDBType -eq '1') { $MailboxType = 'User Mailbox' }
                 else { $Database = 'N/A' }
                 }
