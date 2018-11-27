@@ -10,7 +10,8 @@ The Get-ADMailboxType will query the specified domain controller and retrieve th
 ## Install Instructions
 
 ## Usage
-Get-ADMailboxType -Identity -Server
-
+```PowerShell
+Get-ADMailboxType -Identity <username> -Server <servername>
+```
 ## Sources
 https://blogs.technet.microsoft.com/dkegg/2014/05/09/msexchrecipienttypedetails/
