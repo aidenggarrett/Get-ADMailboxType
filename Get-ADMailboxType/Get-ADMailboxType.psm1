@@ -5,6 +5,8 @@
     The Get-ADMailboxType will query the specified domain controller and retrieve the mailbox type. It will then interpret the value in to a name.
     .Notes
     NAME: Get-ADMailboxType
+    AUTHOR: Aiden Garrett
+    GITHUB: https://github.com/aidenggarrett
 
     #Requires -Version 1
     #Requires -Modules ActiveDirectory
