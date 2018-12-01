@@ -32,39 +32,50 @@ Function Get-ADMailboxType
 
     )
 
-        # Populate $Server if it's equal to null
+        # Recipient Type Hash Table
+        $RecipientTypeTable = [ordered]@{
+            "1" = "User Mailbox"
+            "2" = "Linked Mailbox"
+            "4" = "Shared Mailbox"
+            "8" = "Legacy Mailbox"
+            "16" = "Room Mailbox"
+            "32" = "Equipment Mailbox"
+            "64" = "Mail Contact"
+            "128" = "Mail-enabled User"
+            "256" = "Mail-enabled Universal Distribution Group"
+            "512" = "Mail-enabled non-Universal Distribution Group"
+            "1024" = "Mail-enabled Universal Security Group"
+            "2048" = "Dynamic Distribution Group"
+            "4096" = "Mail-enabled Public Folder"
+            "8192" = "System Attendant Mailbox"
+            "16384" = "Mailbox Database Mailbox"
+            "32768" = "Across-Forest Mail Contact"
+            "65536" = "User"
+            "131072" = "Contact"
+            "262144" = "Universal Distribution Group"
+            "524288" = "Universal Security Group"
+            "1048576" = "Non-Universal Group"
+            "2097152" = "Disabled User"
+            "4194304" = "Microsoft Exchange"
+            "2147483648" = "Remote User Mailbox"
+            "8589934592" = "Remote Room Mailbox"
+            "17179869184" = "Remote Equipment Mailbox"
+            "34359738368" = "Remote Shared Mailbox"
+        }
+
+        # Populate $Server if it's equal to null.
         #if ( $Server -eq $null ) { $Server = (Get-ADDomainController -Discover -Service "GlobalCatalog").Name }
 
-        # Retrieve AD information
+        # Get the msExchRecipientTypeDetails value for the account and assign to a variable.
+        $RecipientTypeValue = ((Get-ADUser -Identity $Identity -Server $Server -Properties msExchRecipientTypeDetails).msExchRecipientTypeDetails)
 
-        Write-Verbose "Retrieving Basic AD Details"
+        # Create a custom object. In it, we get our AD Identity and then lookup the msExchRecipientTypeDetails value to a friendly name.
+        $Output = [ordered]@{
+            "Identity" = ((Get-ADUser -Identity $Identity -Server $Server).Name)
+            "MailboxType" = $RecipientTypeTable["$RecipientTypeValue"]
+        }
 
-        $DisplayName = (Get-ADUser $Identity -Server $Server -Properties DisplayName).DisplayName
-        $CanonicalName = (Get-ADUser $Identity -Server $Server -Properties CanonicalName).CanonicalName
-        $EmailAddress = (Get-ADUser $Identity -Server $Server -Properties EmailAddress).EmailAddress
+        # Write our output to the shell.
+        $Output
 
-        # Retrieve Mailbox Type
-
-        $tmpDBType = (Get-ADUser $Identity -Properties msExchRecipientTypeDetails -Server $Server).msExchRecipientTypeDetails
-        if ($tmpDBType -eq '2147483648' ) { $MailboxType = 'Exchange Online' } else {
-           if ($tmpDBType -eq '1') { $MailboxType = 'User Mailbox' }
-                else { $Database = 'N/A' }
-                }
-
-        # Retrieve Mailbox Database
-
-        # Write-Verbose "Retrieving Mailbox Database"
-
-        if ($tmpDBType -eq '1') { $Database = (Get-AdUser $Identity -Server $Server -Properties homeMDB).homeMDB.split(",=")[1] }
-                else { $Database = 'N/A' }
-
-        # Write information to console
-
-        Write-Verbose "AD Account Summary"
-
-        Write-Host "Display Name:" $DisplayName
-        Write-Host "OU:" $CanonicalName
-        Write-Host "Email Address:" $EmailAddress
-        Write-Host "Mailbox Type:" $MailboxType
-        Write-Host "Database:" $Database
 }
